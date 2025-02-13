@@ -1,0 +1,42 @@
+{
+  "originHash" : "f181f42737c7adbb1708f2f4962c289d2366de572946205f784aeff279c51622",
+  "pins" : [
+    {
+      "identity" : "http-client",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/zunda-pixel/http-client",
+      "state" : {
+        "revision" : "88acdc5c925661d7a53017dfc9cccae6554b02a0",
+        "version" : "0.3.0"
+      }
+    },
+    {
+      "identity" : "protobufkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OpenSwiftUIProject/ProtobufKit",
+      "state" : {
+        "revision" : "937eae5426277bec040c7f99bc8e1498c30ed467",
+        "version" : "0.1.2"
+      }
+    },
+    {
+      "identity" : "swift-currency",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/zunda-pixel/swift-currency",
+      "state" : {
+        "revision" : "476562c17ec5ed2d96794f13a24df86eb7bf96b5",
+        "version" : "0.0.1"
+      }
+    },
+    {
+      "identity" : "swift-http-types",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-http-types",
+      "state" : {
+        "revision" : "ef18d829e8b92d731ad27bb81583edd2094d1ce3",
+        "version" : "1.3.1"
+      }
+    }
+  ],
+  "version" : 3
+}
