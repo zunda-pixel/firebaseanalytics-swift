@@ -2,21 +2,20 @@ import ProtobufKit
 
 public struct EventPayload: ProtobufMessage, Equatable {
   public var parameters: [Parameter.Key: Parameter.Value]
-  public  var eventName: Event.Name
-  public var startDate: UInt?
-  public var endDate: UInt
+  public var eventName: Event.Name
+  public var previousTimestampMillis: UInt?
+  public var timestampMillis: UInt
 
   public init(
     parameters: [Parameter.Key: Parameter.Value],
     eventName: Event.Name,
-    startDate: UInt,
-    endDate: UInt
+    previousTimestampMillis: UInt?,
+    timestampMillis: UInt
   ) {
     self.parameters = parameters
     self.eventName = eventName
-    self.startDate = startDate
-    self.endDate = endDate
-    self.endDate = endDate
+    self.previousTimestampMillis = previousTimestampMillis
+    self.timestampMillis = timestampMillis
   }
 
   public func encode(to encoder: inout ProtobufKit.ProtobufEncoder) throws {
@@ -24,14 +23,14 @@ public struct EventPayload: ProtobufMessage, Equatable {
       try encoder.messageField(1, KeyValue(key: parameter.key, value: parameter.value))
     }
     try encoder.stringField(2, eventName.rawValue, defaultValue: nil)
-    startDate.map { encoder.uintField(4, $0, defaultValue: nil) }
-    encoder.uintField(3, endDate, defaultValue: nil)
+    previousTimestampMillis.map { encoder.uintField(4, $0, defaultValue: nil) }
+    encoder.uintField(3, timestampMillis, defaultValue: nil)
   }
 
   public init(from decoder: inout ProtobufDecoder) throws {
     var eventName: Event.Name?
-    var startDate: UInt?
-    var endDate: UInt?
+    var previousTimestampMillis: UInt?
+    var timestampMillis: UInt?
     var parameters: [Parameter.Key: Parameter.Value] = [:]
     while let field = try decoder.nextField() {
       switch field.tag {
@@ -39,17 +38,19 @@ public struct EventPayload: ProtobufMessage, Equatable {
         let parameter: KeyValue = try decoder.messageField(field)
         parameters[parameter.key] = parameter.value
       case 2: eventName = .init(stringLiteral: try decoder.stringField(field))
-      case 3: endDate = try decoder.uintField(field)
-      case 4: startDate = try decoder.uintField(field)
+      case 3: timestampMillis = try decoder.uintField(field)
+      case 4: previousTimestampMillis = try decoder.uintField(field)
       default: throw ProtobufDecodingError.unknownError
       }
     }
 
-    if let eventName, let endDate {
-      self.parameters = parameters
-      self.eventName = eventName
-      self.startDate = startDate
-      self.endDate = endDate
+    if let eventName, let timestampMillis {
+      self.init(
+        parameters: parameters,
+        eventName: eventName,
+        previousTimestampMillis: previousTimestampMillis,
+        timestampMillis: timestampMillis
+      )
     } else {
       throw ProtobufDecodingError.missingField
     }
