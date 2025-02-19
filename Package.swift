@@ -12,7 +12,7 @@ let package = Package(
     .library(
       name: "Analytics",
       targets: ["Analytics"]
-    ),
+    )
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-http-types", from: "1.3.0"),

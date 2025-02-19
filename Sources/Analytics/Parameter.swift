@@ -19,7 +19,7 @@ public enum Parameter {
     static func bool(_ value: Bool) -> Self {
       .uint(value ? 1 : 0)
     }
-    
+
     public init(from decoder: inout ProtobufDecoder) throws {
       var value: Parameter.Value?
 
