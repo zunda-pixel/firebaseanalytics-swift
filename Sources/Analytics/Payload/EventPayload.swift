@@ -99,16 +99,16 @@ struct KeyValue: ProtobufMessage {
   func encode(to encoder: inout ProtobufEncoder) throws {
     try encoder.stringField(1, key.rawValue, defaultValue: nil)
     switch value {
-    case let .string(value):
+    case .string(let value):
       try encoder.stringField(2, value, defaultValue: nil)
-    case let .uint(value):
+    case .uint(let value):
       encoder.uintField(3, value, defaultValue: nil)
-    case let .float(value):
+    case .float(let value):
       encoder.doubleField(5, value, defaultValue: nil)
-    case let .dictionary(values):
+    case .dictionary(let values):
       let arayValue = Array6(value: .dictionary(values))
       try encoder.messageField(6, arayValue)
-    case let .array(values):
+    case .array(let values):
       for value in values {
         let arayValue = Array6(value: value)
         try encoder.messageField(6, arayValue)
