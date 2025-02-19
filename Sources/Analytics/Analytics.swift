@@ -90,7 +90,8 @@ public struct Analytics<HTTPClient: HTTPClientProtocol> {
       value21: "BC75E8783E8141ECB7A179248F24080C",  // fix // app_instance_id
       value23: 25,  // count up // bundle_sequential_index
       googleAppId: clientInformation.googleAppId,
-      value26: UInt(Date.now.timeIntervalSince1970 * 100),  // free // previous_bundle_start_timestamp_millis
+      // free // previous_bundle_start_timestamp_millis
+      value26: UInt(Date.now.timeIntervalSince1970 * 100),
       value27: "C86A6B98-E407-4954-BC16-F693A22F9FA9",  // fix // resettable_device_id
       value30: "d4Xw8qsiRUIBoMYlsYHnot",  // fix // firebase_instance_id
       value31: 1,  // app_version_major
