@@ -1,14 +1,14 @@
 import ProtobufKit
 
 public struct EventPayload: ProtobufMessage, Equatable {
-  public var parameters: [Parameter.Key: Parameter.Value]
   public var eventName: Event.Name
+  public var parameters: [Parameter.Key: Parameter.Value]
   public var previousTimestampMillis: UInt?
   public var timestampMillis: UInt
 
   public init(
-    parameters: [Parameter.Key: Parameter.Value],
     eventName: Event.Name,
+    parameters: [Parameter.Key: Parameter.Value],
     previousTimestampMillis: UInt?,
     timestampMillis: UInt
   ) {
@@ -46,8 +46,8 @@ public struct EventPayload: ProtobufMessage, Equatable {
 
     if let eventName, let timestampMillis {
       self.init(
-        parameters: parameters,
         eventName: eventName,
+        parameters: parameters,
         previousTimestampMillis: previousTimestampMillis,
         timestampMillis: timestampMillis
       )

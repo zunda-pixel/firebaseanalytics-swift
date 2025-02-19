@@ -60,14 +60,14 @@ public struct Analytics<HTTPClient: HTTPClientProtocol> {
       value: 1,
       events: [
         EventPayload(
-          parameters: parameters.merging([.platform: "app"]) { $1 }.compactMapValues { $0 },
           eventName: eventName,
+          parameters: parameters.merging([.platform: "app"]) { $1 }.compactMapValues { $0 },
           previousTimestampMillis: UInt(Date.now.timeIntervalSince1970 * 100),
           timestampMillis: UInt(Date.now.timeIntervalSince1970 * 100)
         ),
         EventPayload(
-          parameters: ["_et": .uint(891), .platform: "auto"],
           eventName: "_e",
+          parameters: ["_et": .uint(891), .platform: "auto"],
           previousTimestampMillis: UInt(Date.now.timeIntervalSince1970 * 100),
           timestampMillis: UInt(Date.now.timeIntervalSince1970 * 100)
         ),
