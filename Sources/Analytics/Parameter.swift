@@ -19,7 +19,7 @@ public enum Parameter {
     static func bool(_ value: Bool) -> Self {
       .uint(value ? 1 : 0)
     }
-    
+
     public init(from decoder: inout ProtobufDecoder) throws {
       var value: Parameter.Value?
 
@@ -58,17 +58,17 @@ public enum Parameter {
 
     public func encode(to encoder: inout ProtobufEncoder) throws {
       switch self {
-      case let .string(value):
+      case .string(let value):
         try encoder.stringField(1, value, defaultValue: nil)
-      case let .uint(value):
+      case .uint(let value):
         encoder.uintField(2, value, defaultValue: nil)
-      case let .float(value):
+      case .float(let value):
         encoder.doubleField(5, value, defaultValue: nil)
-      case let .dictionary(value):
+      case .dictionary(let value):
         for (key, value) in value {
           try encoder.messageField(6, KeyValue(key: key, value: value))
         }
-      case let .array(values):
+      case .array(let values):
         for item in values {
           try encoder.messageField(6, item)
         }

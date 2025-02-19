@@ -1,14 +1,14 @@
 import ProtobufKit
 
 public struct EventPayload: ProtobufMessage, Equatable {
-  public var parameters: [Parameter.Key: Parameter.Value]
   public var eventName: Event.Name
+  public var parameters: [Parameter.Key: Parameter.Value]
   public var previousTimestampMillis: UInt?
   public var timestampMillis: UInt
 
   public init(
-    parameters: [Parameter.Key: Parameter.Value],
     eventName: Event.Name,
+    parameters: [Parameter.Key: Parameter.Value],
     previousTimestampMillis: UInt?,
     timestampMillis: UInt
   ) {
@@ -46,8 +46,8 @@ public struct EventPayload: ProtobufMessage, Equatable {
 
     if let eventName, let timestampMillis {
       self.init(
-        parameters: parameters,
         eventName: eventName,
+        parameters: parameters,
         previousTimestampMillis: previousTimestampMillis,
         timestampMillis: timestampMillis
       )
@@ -99,16 +99,16 @@ struct KeyValue: ProtobufMessage {
   func encode(to encoder: inout ProtobufEncoder) throws {
     try encoder.stringField(1, key.rawValue, defaultValue: nil)
     switch value {
-    case let .string(value):
+    case .string(let value):
       try encoder.stringField(2, value, defaultValue: nil)
-    case let .uint(value):
+    case .uint(let value):
       encoder.uintField(3, value, defaultValue: nil)
-    case let .float(value):
+    case .float(let value):
       encoder.doubleField(5, value, defaultValue: nil)
-    case let .dictionary(values):
+    case .dictionary(let values):
       let arayValue = Array6(value: .dictionary(values))
       try encoder.messageField(6, arayValue)
-    case let .array(values):
+    case .array(let values):
       for value in values {
         let arayValue = Array6(value: value)
         try encoder.messageField(6, arayValue)

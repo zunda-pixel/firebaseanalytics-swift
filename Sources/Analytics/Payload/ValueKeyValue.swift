@@ -61,17 +61,17 @@ public struct ValueKeyValue: ProtobufMessage, Equatable {
     encoder.uintField(1, date, defaultValue: nil)
     try encoder.stringField(2, key, defaultValue: nil)
     switch value {
-    case let .string(value):
+    case .string(let value):
       try encoder.stringField(3, value, defaultValue: nil)
-    case let .uint(value):
+    case .uint(let value):
       encoder.uintField(4, value, defaultValue: nil)
-    case let .float(value):
+    case .float(let value):
       encoder.doubleField(6, value, defaultValue: nil)
-    case let .dictionary(values):
+    case .dictionary(let values):
       for item in values {
         try encoder.messageField(7, KeyValue(key: item.key, value: item.value))
       }
-    case let .array(values):
+    case .array(let values):
       for item in values {
         try encoder.messageField(7, item)
       }
