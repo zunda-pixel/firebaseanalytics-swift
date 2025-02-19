@@ -35,9 +35,6 @@ let package = Package(
       dependencies: [
         .target(name: "Analytics"),
         .product(name: "HTTPTypesFoundation", package: "swift-http-types"),
-      ],
-      resources: [
-        .process("Resources")
       ]
     ),
   ]
