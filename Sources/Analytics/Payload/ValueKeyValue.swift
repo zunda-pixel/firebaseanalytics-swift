@@ -1,5 +1,8 @@
 import ProtobufKit
 
+/// `appmeasurement.UserAttribute`
+///
+/// 1: set timestamp (millis), 2: name, 3: string, 4: int64, 5: float, 6: double
 public struct ValueKeyValue: ProtobufMessage, Equatable {
   public var date: UInt
   public var key: String
@@ -29,6 +32,7 @@ public struct ValueKeyValue: ProtobufMessage, Equatable {
       case 2: key = try decoder.stringField(field)
       case 3: value = .string(try decoder.stringField(field))
       case 4: value = .uint(try decoder.uintField(field))
+      case 5: value = .float(Double(try decoder.floatField(field)))
       case 6: value = .float(try decoder.doubleField(field))
       case 7:
         if let keyValue: KeyValue = try? decoder.messageField(field) {

@@ -1,259 +1,377 @@
 import ProtobufKit
 
+/// `appmeasurement.MeasurementBundle`
+///
+/// Field numbers, wire types and meanings were taken from `GoogleAppMeasurement` 13.0.1
+/// (`gmp_measurement.pb.o` field tables and the `APMMeasurement` code that fills each field).
+/// See `docs/measurement-protocol.md` for the full table.
 public struct Payload: ProtobufMessage, Equatable {
-  public var value: UInt
+  /// 1: `APMMeasurementProtocolVersion` (always `1`)
+  public var protocolVersion: UInt
+  /// 2
   public var events: [EventPayload]?
-  public var sessionInformations: [ValueKeyValue]
-  public var value4: UInt?
-  public var value5: UInt?
-  public var value6: UInt?
-  public var value7: UInt?
+  /// 3: user properties (`_fot`, `_sid`, `_sno`, ...)
+  public var userAttributes: [ValueKeyValue]
+  /// 4: time when the bundle is uploaded
+  public var uploadTimestampMillis: UInt?
+  /// 5: timestamp of the oldest event in the bundle
+  public var startTimestampMillis: UInt?
+  /// 6: timestamp of the newest event in the bundle
+  public var endTimestampMillis: UInt?
+  /// 7: `endTimestampMillis` of the previous bundle
+  public var previousBundleEndTimestampMillis: UInt?
+  /// 8: platform (`"ios"`)
   public var os: String
+  /// 9
   public var osVersion: String
+  /// 10
   public var deviceModel: String
-  public var value11: String?
-  public var value12: UInt?
+  /// 11: e.g. `"ja-jp"`
+  public var userDefaultLanguage: String?
+  /// 12: e.g. `540` for UTC+9
+  public var timeZoneOffsetMinutes: Int?
+  /// 13: `"manual_install"` or App Store
   public var installMethod: String
+  /// 14
   public var bundleId: String
+  /// 16
   public var appVersion: String
-  public var value17: UInt?
-  public var value18: UInt?
-  public var value21: String?
-  public var value23: UInt?
+  /// 17: `appMeasurementLibraryVersion` when the event was recorded
+  public var gmpVersion: UInt?
+  /// 18: `appMeasurementLibraryVersion` when the bundle is uploaded
+  public var uploadingGmpVersion: UInt?
+  /// 19: advertising identifier (IDFA)
+  public var resettableDeviceId: String?
+  /// 20
+  public var limitedAdTracking: Bool?
+  /// 21
+  public var appInstanceId: String?
+  /// 23: incremented for each bundle (`lastBundleIndex`)
+  public var bundleSequentialIndex: UInt?
+  /// 24: health monitoring data
+  public var healthMonitor: String?
+  /// 25
   public var googleAppId: String
-  public var value26: UInt?
-  public var value27: String?
-  public var value30: String?
-  public var value31: UInt?
-  public var value35: UInt?
-  public var value39: UInt?
-  public var value45: UInt?
-  public var value52: String?
-  public var value64: String?
-  public var value71: String?
-  public var value72: UInt?
-  public var value77: UInt?
+  /// 26: `startTimestampMillis` of the previous bundle
+  public var previousBundleStartTimestampMillis: UInt?
+  /// 27: `UIDevice.identifierForVendor` (IDFV)
+  public var vendorDeviceId: String?
+  /// 30: Firebase Installation ID
+  public var firebaseInstanceId: String?
+  /// 31
+  public var appVersionMajor: UInt?
+  /// 32
+  public var appVersionMinor: UInt?
+  /// 33
+  public var appVersionRelease: UInt?
+  /// 35: remote config version
+  public var configVersion: UInt?
+  /// 39: number of failed upload attempts of this bundle
+  public var retryCount: UInt?
+  /// 45
+  public var experimentIds: [UInt]
+  /// 52: `"G1"` + ad_storage + analytics_storage. See ``ConsentSettings/consentSignals``
+  public var consentSignals: String?
+  /// 53: ATT authorization status (`appleConsentStatus`)
+  public var appleConsentStatus: UInt?
+  /// 63
+  public var sessionStitchingToken: String?
+  /// 64: e.g. `["google_signals"]`
+  public var redactedFields: [String]
+  /// 65
+  public var ephemeralAppInstanceId: String?
+  /// 71: `"1"` + diagnostic source per consent type. See ``ConsentSettings/consentDiagnostics``
+  public var consentDiagnostics: String?
+  /// 72: whether the device is in a DMA (Digital Markets Act) region
+  public var isDMARegion: Bool?
+  /// 73: linked core platform services joined (`"-"` when empty)
+  public var corePlatformServices: String?
+  /// 77: incremented for each delivery (`lastDeliveryIndex`)
+  public var deliveryIndex: UInt?
 
   public init(
-    value: UInt,
+    protocolVersion: UInt = 1,
     events: [EventPayload]? = nil,
-    sessionInformations: [ValueKeyValue],
-    value4: UInt? = nil,
-    value5: UInt? = nil,
-    value6: UInt? = nil,
-    value7: UInt? = nil,
+    userAttributes: [ValueKeyValue],
+    uploadTimestampMillis: UInt? = nil,
+    startTimestampMillis: UInt? = nil,
+    endTimestampMillis: UInt? = nil,
+    previousBundleEndTimestampMillis: UInt? = nil,
     os: String,
     osVersion: String,
     deviceModel: String,
-    value11: String? = nil,
-    value12: UInt? = nil,
+    userDefaultLanguage: String? = nil,
+    timeZoneOffsetMinutes: Int? = nil,
     installMethod: String,
     bundleId: String,
     appVersion: String,
-    value17: UInt? = nil,
-    value18: UInt? = nil,
-    value21: String? = nil,
-    value23: UInt? = nil,
+    gmpVersion: UInt? = nil,
+    uploadingGmpVersion: UInt? = nil,
+    resettableDeviceId: String? = nil,
+    limitedAdTracking: Bool? = nil,
+    appInstanceId: String? = nil,
+    bundleSequentialIndex: UInt? = nil,
+    healthMonitor: String? = nil,
     googleAppId: String,
-    value26: UInt? = nil,
-    value27: String? = nil,
-    value30: String? = nil,
-    value31: UInt? = nil,
-    value35: UInt? = nil,
-    value39: UInt? = nil,
-    value45: UInt? = nil,
-    value52: String? = nil,
-    value64: String? = nil,
-    value71: String? = nil,
-    value72: UInt? = nil,
-    value77: UInt? = nil
+    previousBundleStartTimestampMillis: UInt? = nil,
+    vendorDeviceId: String? = nil,
+    firebaseInstanceId: String? = nil,
+    appVersionMajor: UInt? = nil,
+    appVersionMinor: UInt? = nil,
+    appVersionRelease: UInt? = nil,
+    configVersion: UInt? = nil,
+    retryCount: UInt? = nil,
+    experimentIds: [UInt] = [],
+    consentSignals: String? = nil,
+    appleConsentStatus: UInt? = nil,
+    sessionStitchingToken: String? = nil,
+    redactedFields: [String] = [],
+    ephemeralAppInstanceId: String? = nil,
+    consentDiagnostics: String? = nil,
+    isDMARegion: Bool? = nil,
+    corePlatformServices: String? = nil,
+    deliveryIndex: UInt? = nil
   ) {
-    self.value = value
+    self.protocolVersion = protocolVersion
     self.events = events
-    self.sessionInformations = sessionInformations
-    self.value4 = value4
-    self.value5 = value5
-    self.value6 = value6
-    self.value7 = value7
+    self.userAttributes = userAttributes
+    self.uploadTimestampMillis = uploadTimestampMillis
+    self.startTimestampMillis = startTimestampMillis
+    self.endTimestampMillis = endTimestampMillis
+    self.previousBundleEndTimestampMillis = previousBundleEndTimestampMillis
     self.os = os
     self.osVersion = osVersion
     self.deviceModel = deviceModel
-    self.value11 = value11
-    self.value12 = value12
+    self.userDefaultLanguage = userDefaultLanguage
+    self.timeZoneOffsetMinutes = timeZoneOffsetMinutes
     self.installMethod = installMethod
     self.bundleId = bundleId
     self.appVersion = appVersion
-    self.value17 = value17
-    self.value18 = value18
-    self.value21 = value21
-    self.value23 = value23
+    self.gmpVersion = gmpVersion
+    self.uploadingGmpVersion = uploadingGmpVersion
+    self.resettableDeviceId = resettableDeviceId
+    self.limitedAdTracking = limitedAdTracking
+    self.appInstanceId = appInstanceId
+    self.bundleSequentialIndex = bundleSequentialIndex
+    self.healthMonitor = healthMonitor
     self.googleAppId = googleAppId
-    self.value26 = value26
-    self.value27 = value27
-    self.value30 = value30
-    self.value31 = value31
-    self.value35 = value35
-    self.value39 = value39
-    self.value45 = value45
-    self.value52 = value52
-    self.value64 = value64
-    self.value71 = value71
-    self.value72 = value72
-    self.value77 = value77
+    self.previousBundleStartTimestampMillis = previousBundleStartTimestampMillis
+    self.vendorDeviceId = vendorDeviceId
+    self.firebaseInstanceId = firebaseInstanceId
+    self.appVersionMajor = appVersionMajor
+    self.appVersionMinor = appVersionMinor
+    self.appVersionRelease = appVersionRelease
+    self.configVersion = configVersion
+    self.retryCount = retryCount
+    self.experimentIds = experimentIds
+    self.consentSignals = consentSignals
+    self.appleConsentStatus = appleConsentStatus
+    self.sessionStitchingToken = sessionStitchingToken
+    self.redactedFields = redactedFields
+    self.ephemeralAppInstanceId = ephemeralAppInstanceId
+    self.consentDiagnostics = consentDiagnostics
+    self.isDMARegion = isDMARegion
+    self.corePlatformServices = corePlatformServices
+    self.deliveryIndex = deliveryIndex
   }
 
   public init(from decoder: inout ProtobufDecoder) throws {
-    var value: UInt?
+    var protocolVersion: UInt?
     var events: [EventPayload] = []
-    var sessionInformations: [ValueKeyValue] = []
-    var value4: UInt?
-    var value5: UInt?
-    var value6: UInt?
-    var value7: UInt?
+    var userAttributes: [ValueKeyValue] = []
+    var uploadTimestampMillis: UInt?
+    var startTimestampMillis: UInt?
+    var endTimestampMillis: UInt?
+    var previousBundleEndTimestampMillis: UInt?
     var os: String?
     var osVersion: String?
     var deviceModel: String?
-    var value11: String?
-    var value12: UInt?
+    var userDefaultLanguage: String?
+    var timeZoneOffsetMinutes: Int?
     var installMethod: String?
     var bundleId: String?
     var appVersion: String?
-    var value17: UInt?
-    var value18: UInt?
-    var value21: String?
-    var value23: UInt?
+    var gmpVersion: UInt?
+    var uploadingGmpVersion: UInt?
+    var resettableDeviceId: String?
+    var limitedAdTracking: Bool?
+    var appInstanceId: String?
+    var bundleSequentialIndex: UInt?
+    var healthMonitor: String?
     var googleAppId: String?
-    var value26: UInt?
-    var value27: String?
-    var value30: String?
-    var value31: UInt?
-    var value35: UInt?
-    var value39: UInt?
-    var value45: UInt?
-    var value52: String?
-    var value64: String?
-    var value71: String?
-    var value72: UInt?
-    var value77: UInt?
+    var previousBundleStartTimestampMillis: UInt?
+    var vendorDeviceId: String?
+    var firebaseInstanceId: String?
+    var appVersionMajor: UInt?
+    var appVersionMinor: UInt?
+    var appVersionRelease: UInt?
+    var configVersion: UInt?
+    var retryCount: UInt?
+    var experimentIds: [UInt] = []
+    var consentSignals: String?
+    var appleConsentStatus: UInt?
+    var sessionStitchingToken: String?
+    var redactedFields: [String] = []
+    var ephemeralAppInstanceId: String?
+    var consentDiagnostics: String?
+    var isDMARegion: Bool?
+    var corePlatformServices: String?
+    var deliveryIndex: UInt?
 
     while let field = try decoder.nextField() {
       switch field.tag {
-      case 1: value = try decoder.uintField(field)
+      case 1: protocolVersion = try decoder.uintField(field)
       case 2:
         let event: EventPayload = try decoder.messageField(field)
         events.append(event)
       case 3:
-        let session: ValueKeyValue = try decoder.messageField(field)
-        sessionInformations.append(session)
-      case 4: value4 = try decoder.uintField(field)
-      case 5: value5 = try decoder.uintField(field)
-      case 6: value6 = try decoder.uintField(field)
-      case 7: value7 = try decoder.uintField(field)
+        let userAttribute: ValueKeyValue = try decoder.messageField(field)
+        userAttributes.append(userAttribute)
+      case 4: uploadTimestampMillis = try decoder.uintField(field)
+      case 5: startTimestampMillis = try decoder.uintField(field)
+      case 6: endTimestampMillis = try decoder.uintField(field)
+      case 7: previousBundleEndTimestampMillis = try decoder.uintField(field)
       case 8: os = try decoder.stringField(field)
       case 9: osVersion = try decoder.stringField(field)
       case 10: deviceModel = try decoder.stringField(field)
-      case 11: value11 = try decoder.stringField(field)
-      case 12: value12 = try decoder.uintField(field)
+      case 11: userDefaultLanguage = try decoder.stringField(field)
+      case 12: timeZoneOffsetMinutes = Int(Int32(truncatingIfNeeded: try decoder.uintField(field)))
       case 13: installMethod = try decoder.stringField(field)
       case 14: bundleId = try decoder.stringField(field)
       case 16: appVersion = try decoder.stringField(field)
-      case 17: value17 = try decoder.uintField(field)
-      case 18: value18 = try decoder.uintField(field)
-      case 21: value21 = try decoder.stringField(field)
-      case 23: value23 = try decoder.uintField(field)
+      case 17: gmpVersion = try decoder.uintField(field)
+      case 18: uploadingGmpVersion = try decoder.uintField(field)
+      case 19: resettableDeviceId = try decoder.stringField(field)
+      case 20: limitedAdTracking = try decoder.boolField(field)
+      case 21: appInstanceId = try decoder.stringField(field)
+      case 23: bundleSequentialIndex = try decoder.uintField(field)
+      case 24: healthMonitor = try decoder.stringField(field)
       case 25: googleAppId = try decoder.stringField(field)
-      case 26: value26 = try decoder.uintField(field)
-      case 27: value27 = try decoder.stringField(field)
-      case 30: value30 = try decoder.stringField(field)
-      case 31: value31 = try decoder.uintField(field)
-      case 35: value35 = try decoder.uintField(field)
-      case 39: value39 = try decoder.uintField(field)
-      case 45: value45 = try decoder.uintField(field)
-      case 52: value52 = try decoder.stringField(field)
-      case 64: value64 = try decoder.stringField(field)
-      case 71: value71 = try decoder.stringField(field)
-      case 72: value72 = try decoder.uintField(field)
-      case 77: value77 = try decoder.uintField(field)
-      default: throw ProtobufDecodingError.unknownError
+      case 26: previousBundleStartTimestampMillis = try decoder.uintField(field)
+      case 27: vendorDeviceId = try decoder.stringField(field)
+      case 30: firebaseInstanceId = try decoder.stringField(field)
+      case 31: appVersionMajor = try decoder.uintField(field)
+      case 32: appVersionMinor = try decoder.uintField(field)
+      case 33: appVersionRelease = try decoder.uintField(field)
+      case 35: configVersion = try decoder.uintField(field)
+      case 39: retryCount = try decoder.uintField(field)
+      case 45: experimentIds.append(try decoder.uintField(field))
+      case 52: consentSignals = try decoder.stringField(field)
+      case 53: appleConsentStatus = try decoder.uintField(field)
+      case 63: sessionStitchingToken = try decoder.stringField(field)
+      case 64: redactedFields.append(try decoder.stringField(field))
+      case 65: ephemeralAppInstanceId = try decoder.stringField(field)
+      case 71: consentDiagnostics = try decoder.stringField(field)
+      case 72: isDMARegion = try decoder.boolField(field)
+      case 73: corePlatformServices = try decoder.stringField(field)
+      case 77: deliveryIndex = try decoder.uintField(field)
+      // 22, 15, 28, 29, 34, 41, 47, 50, 55, 59, 67, 75, 79, 84, 86, 87, 89, 91 are not modeled yet.
+      default: try decoder.skipField(field)
       }
     }
 
-    if let value, let os, let osVersion, let deviceModel, let installMethod, let bundleId,
+    if let protocolVersion, let os, let osVersion, let deviceModel, let installMethod, let bundleId,
       let appVersion, let googleAppId
     {
-      self.value = value
-      self.events = events
-      self.sessionInformations = sessionInformations
-      self.value4 = value4
-      self.value5 = value5
-      self.value6 = value6
-      self.value7 = value7
-      self.os = os
-      self.osVersion = osVersion
-      self.deviceModel = deviceModel
-      self.value11 = value11
-      self.value12 = value12
-      self.installMethod = installMethod
-      self.bundleId = bundleId
-      self.appVersion = appVersion
-      self.value17 = value17
-      self.value18 = value18
-      self.value21 = value21
-      self.value23 = value23
-      self.googleAppId = googleAppId
-      self.value26 = value26
-      self.value27 = value27
-      self.value30 = value30
-      self.value31 = value31
-      self.value35 = value35
-      self.value39 = value39
-      self.value45 = value45
-      self.value52 = value52
-      self.value64 = value64
-      self.value71 = value71
-      self.value72 = value72
-      self.value77 = value77
+      self.init(
+        protocolVersion: protocolVersion,
+        events: events,
+        userAttributes: userAttributes,
+        uploadTimestampMillis: uploadTimestampMillis,
+        startTimestampMillis: startTimestampMillis,
+        endTimestampMillis: endTimestampMillis,
+        previousBundleEndTimestampMillis: previousBundleEndTimestampMillis,
+        os: os,
+        osVersion: osVersion,
+        deviceModel: deviceModel,
+        userDefaultLanguage: userDefaultLanguage,
+        timeZoneOffsetMinutes: timeZoneOffsetMinutes,
+        installMethod: installMethod,
+        bundleId: bundleId,
+        appVersion: appVersion,
+        gmpVersion: gmpVersion,
+        uploadingGmpVersion: uploadingGmpVersion,
+        resettableDeviceId: resettableDeviceId,
+        limitedAdTracking: limitedAdTracking,
+        appInstanceId: appInstanceId,
+        bundleSequentialIndex: bundleSequentialIndex,
+        healthMonitor: healthMonitor,
+        googleAppId: googleAppId,
+        previousBundleStartTimestampMillis: previousBundleStartTimestampMillis,
+        vendorDeviceId: vendorDeviceId,
+        firebaseInstanceId: firebaseInstanceId,
+        appVersionMajor: appVersionMajor,
+        appVersionMinor: appVersionMinor,
+        appVersionRelease: appVersionRelease,
+        configVersion: configVersion,
+        retryCount: retryCount,
+        experimentIds: experimentIds,
+        consentSignals: consentSignals,
+        appleConsentStatus: appleConsentStatus,
+        sessionStitchingToken: sessionStitchingToken,
+        redactedFields: redactedFields,
+        ephemeralAppInstanceId: ephemeralAppInstanceId,
+        consentDiagnostics: consentDiagnostics,
+        isDMARegion: isDMARegion,
+        corePlatformServices: corePlatformServices,
+        deliveryIndex: deliveryIndex
+      )
     } else {
       throw ProtobufDecodingError.missingField
     }
   }
 
   public func encode(to encoder: inout ProtobufEncoder) throws {
-    encoder.uintField(1, value, defaultValue: nil)
+    encoder.uintField(1, protocolVersion, defaultValue: nil)
     for event in events ?? [] {
       try encoder.messageField(2, event)
     }
-    for item in sessionInformations {
-      try encoder.messageField(3, item)
+    for userAttribute in userAttributes {
+      try encoder.messageField(3, userAttribute)
     }
-    value4.map { encoder.uintField(4, $0, defaultValue: nil) }
-    value5.map { encoder.uintField(5, $0, defaultValue: nil) }
-    value6.map { encoder.uintField(6, $0, defaultValue: nil) }
-    value7.map { encoder.uintField(7, $0, defaultValue: nil) }
+    uploadTimestampMillis.map { encoder.uintField(4, $0, defaultValue: nil) }
+    startTimestampMillis.map { encoder.uintField(5, $0, defaultValue: nil) }
+    endTimestampMillis.map { encoder.uintField(6, $0, defaultValue: nil) }
+    previousBundleEndTimestampMillis.map { encoder.uintField(7, $0, defaultValue: nil) }
     try encoder.stringField(8, os, defaultValue: nil)
     try encoder.stringField(9, osVersion, defaultValue: nil)
     try encoder.stringField(10, deviceModel, defaultValue: nil)
-    try value11.map { try encoder.stringField(11, $0, defaultValue: nil) }
-    value12.map { encoder.uintField(12, $0, defaultValue: nil) }
+    try userDefaultLanguage.map { try encoder.stringField(11, $0, defaultValue: nil) }
+    // int32: negative values are encoded as 64-bit two's complement varint (not zigzag)
+    timeZoneOffsetMinutes.map { encoder.uintField(12, UInt(bitPattern: $0), defaultValue: nil) }
     try encoder.stringField(13, installMethod, defaultValue: nil)
     try encoder.stringField(14, bundleId, defaultValue: nil)
     try encoder.stringField(16, appVersion, defaultValue: nil)
-    value17.map { encoder.uintField(17, $0, defaultValue: nil) }
-    value18.map { encoder.uintField(18, $0, defaultValue: nil) }
-    try value21.map { try encoder.stringField(21, $0, defaultValue: nil) }
-    value23.map { encoder.uintField(23, $0, defaultValue: nil) }
+    gmpVersion.map { encoder.uintField(17, $0, defaultValue: nil) }
+    uploadingGmpVersion.map { encoder.uintField(18, $0, defaultValue: nil) }
+    try resettableDeviceId.map { try encoder.stringField(19, $0, defaultValue: nil) }
+    limitedAdTracking.map { encoder.boolField(20, $0, defaultValue: nil) }
+    try appInstanceId.map { try encoder.stringField(21, $0, defaultValue: nil) }
+    bundleSequentialIndex.map { encoder.uintField(23, $0, defaultValue: nil) }
+    try healthMonitor.map { try encoder.stringField(24, $0, defaultValue: nil) }
     try encoder.stringField(25, googleAppId, defaultValue: nil)
-    value26.map { encoder.uintField(26, $0) }
-    try value27.map { try encoder.stringField(27, $0, defaultValue: nil) }
-    try value30.map { try encoder.stringField(30, $0, defaultValue: nil) }
-    value31.map { encoder.uintField(31, $0, defaultValue: nil) }
-    value35.map { encoder.uintField(35, $0, defaultValue: nil) }
-    value39.map { encoder.uintField(39, $0, defaultValue: nil) }
-    value45.map { encoder.uintField(45, $0, defaultValue: nil) }
-    try value52.map { try encoder.stringField(52, $0, defaultValue: nil) }
-    try value64.map { try encoder.stringField(64, $0, defaultValue: nil) }
-    try value71.map { try encoder.stringField(71, $0, defaultValue: nil) }
-    value72.map { encoder.uintField(72, $0, defaultValue: nil) }
-    value77.map { encoder.uintField(77, $0, defaultValue: nil) }
+    previousBundleStartTimestampMillis.map { encoder.uintField(26, $0, defaultValue: nil) }
+    try vendorDeviceId.map { try encoder.stringField(27, $0, defaultValue: nil) }
+    try firebaseInstanceId.map { try encoder.stringField(30, $0, defaultValue: nil) }
+    appVersionMajor.map { encoder.uintField(31, $0, defaultValue: nil) }
+    appVersionMinor.map { encoder.uintField(32, $0, defaultValue: nil) }
+    appVersionRelease.map { encoder.uintField(33, $0, defaultValue: nil) }
+    configVersion.map { encoder.uintField(35, $0, defaultValue: nil) }
+    retryCount.map { encoder.uintField(39, $0, defaultValue: nil) }
+    // repeated, not packed
+    for experimentId in experimentIds {
+      encoder.uintField(45, experimentId, defaultValue: nil)
+    }
+    try consentSignals.map { try encoder.stringField(52, $0, defaultValue: nil) }
+    appleConsentStatus.map { encoder.uintField(53, $0, defaultValue: nil) }
+    try sessionStitchingToken.map { try encoder.stringField(63, $0, defaultValue: nil) }
+    for redactedField in redactedFields {
+      try encoder.stringField(64, redactedField, defaultValue: nil)
+    }
+    try ephemeralAppInstanceId.map { try encoder.stringField(65, $0, defaultValue: nil) }
+    try consentDiagnostics.map { try encoder.stringField(71, $0, defaultValue: nil) }
+    isDMARegion.map { encoder.boolField(72, $0, defaultValue: nil) }
+    try corePlatformServices.map { try encoder.stringField(73, $0, defaultValue: nil) }
+    deliveryIndex.map { encoder.uintField(77, $0, defaultValue: nil) }
   }
 }

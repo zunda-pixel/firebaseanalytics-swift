@@ -56,52 +56,51 @@ public struct Analytics<HTTPClient: HTTPClientProtocol> {
     eventName: Event.Name,
     parameters: [Parameter.Key: Parameter.Value?]
   ) async throws {
+    let nowMillis = UInt(Date.now.timeIntervalSince1970 * 1000)
     let payload = Payload(
-      value: 1,
       events: [
         EventPayload(
           eventName: eventName,
           parameters: parameters.merging([.platform: "app"]) { $1 }.compactMapValues { $0 },
-          previousTimestampMillis: UInt(Date.now.timeIntervalSince1970 * 100),
-          timestampMillis: UInt(Date.now.timeIntervalSince1970 * 100)
+          previousTimestampMillis: nowMillis,
+          timestampMillis: nowMillis
         ),
         EventPayload(
           eventName: "_e",
           parameters: ["_et": .uint(891), .platform: "auto"],
-          previousTimestampMillis: UInt(Date.now.timeIntervalSince1970 * 100),
-          timestampMillis: UInt(Date.now.timeIntervalSince1970 * 100)
+          previousTimestampMillis: nowMillis,
+          timestampMillis: nowMillis
         ),
       ],
-      sessionInformations: session.parameters,
-      value4: UInt(Date.now.timeIntervalSince1970 * 100),  // upload_timestamp_millis
-      value5: UInt(Date.now.timeIntervalSince1970 * 100),  // start_timestamp_millis
-      value6: UInt(Date.now.timeIntervalSince1970 * 100),  // end_timestamp_millis
-      value7: UInt(Date.now.timeIntervalSince1970 * 100),  // previous_bundle_end_timestamp_millis
+      userAttributes: session.parameters,
+      uploadTimestampMillis: nowMillis,
+      startTimestampMillis: nowMillis,
+      endTimestampMillis: nowMillis,
+      previousBundleEndTimestampMillis: nowMillis,
       os: clientInformation.os,
       osVersion: clientInformation.osVersion,
       deviceModel: clientInformation.deviceModel,
-      value11: clientInformation.locale,
-      value12: clientInformation.localeId,
+      userDefaultLanguage: clientInformation.locale,
+      timeZoneOffsetMinutes: clientInformation.timeZoneOffsetMinutes,
       installMethod: clientInformation.installMethod,
       bundleId: clientInformation.bundleId,
       appVersion: clientInformation.appVersion,
-      value17: 110700,  // gmp_version
-      value18: 110700,  // uploading_gmp_version
-      value21: "BC75E8783E8141ECB7A179248F24080C",  // fix // app_instance_id
-      value23: 25,  // count up // bundle_sequential_index
+      gmpVersion: 110700,
+      uploadingGmpVersion: 110700,
+      appInstanceId: "BC75E8783E8141ECB7A179248F24080C",  // fix
+      bundleSequentialIndex: 25,  // count up
       googleAppId: clientInformation.googleAppId,
-      // free // previous_bundle_start_timestamp_millis
-      value26: UInt(Date.now.timeIntervalSince1970 * 100),
-      value27: "C86A6B98-E407-4954-BC16-F693A22F9FA9",  // fix // resettable_device_id
-      value30: "d4Xw8qsiRUIBoMYlsYHnot",  // fix // firebase_instance_id
-      value31: 1,  // app_version_major
-      value35: 1_727_127_969_769_945,  // fix // config_version
-      value45: 42_820_019,  // fix
-      value52: "G1--",  // fix // consent_signals
-      value64: "google_signals",  // fix
-      value71: "19911",  // fix // consent_diagnostics
-      value72: 0,  // fix
-      value77: 13  // count up
+      previousBundleStartTimestampMillis: nowMillis,
+      vendorDeviceId: "C86A6B98-E407-4954-BC16-F693A22F9FA9",  // fix // IDFV
+      firebaseInstanceId: "d4Xw8qsiRUIBoMYlsYHnot",  // fix
+      appVersionMajor: 1,
+      configVersion: 1_727_127_969_769_945,  // fix
+      experimentIds: [42_820_019],  // fix
+      consentSignals: ConsentSettings().consentSignals,
+      redactedFields: ["google_signals"],  // fix
+      consentDiagnostics: "19911",  // fix
+      isDMARegion: false,
+      deliveryIndex: 13  // count up
     )
 
     try await log(payload: payload)

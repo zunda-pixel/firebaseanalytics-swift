@@ -9,6 +9,8 @@ public enum Parameter {
     }
   }
 
+  /// Encoded as `appmeasurement.EventParam` without name
+  /// (2: string, 3: int64, 4: float, 5: double, 6: repeated EventParam).
   public enum Value: Sendable, ProtobufMessage, Equatable {
     case string(String)
     case uint(UInt)
@@ -28,8 +30,9 @@ public enum Parameter {
 
       while let field = try decoder.nextField() {
         switch field.tag {
-        case 1: value = .string(try decoder.stringField(field))
-        case 2: value = .uint(try decoder.uintField(field))
+        case 2: value = .string(try decoder.stringField(field))
+        case 3: value = .uint(try decoder.uintField(field))
+        case 4: value = .float(Double(try decoder.floatField(field)))
         case 5: value = .float(try decoder.doubleField(field))
         case 6:
           if let keyValue: KeyValue = try? decoder.messageField(field) {
@@ -59,9 +62,9 @@ public enum Parameter {
     public func encode(to encoder: inout ProtobufEncoder) throws {
       switch self {
       case .string(let value):
-        try encoder.stringField(1, value, defaultValue: nil)
+        try encoder.stringField(2, value, defaultValue: nil)
       case .uint(let value):
-        encoder.uintField(2, value, defaultValue: nil)
+        encoder.uintField(3, value, defaultValue: nil)
       case .float(let value):
         encoder.doubleField(5, value, defaultValue: nil)
       case .dictionary(let value):
