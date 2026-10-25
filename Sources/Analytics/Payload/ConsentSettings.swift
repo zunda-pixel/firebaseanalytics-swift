@@ -15,6 +15,25 @@ public struct ConsentSettings: Sendable, Equatable {
       self.rawValue = rawValue
     }
 
+    /// Maps the SDK's consent source priority to its wire diagnostic digit.
+    /// The semantic names of priorities 5/10/20/30/40 are not established.
+    public init(consentSource: Int) {
+      switch consentSource {
+      case 5: self = Self(rawValue: 7)
+      case 10, 30: self = Self(rawValue: 5)
+      case 20: self = Self(rawValue: 3)
+      case 40: self = Self(rawValue: 4)
+      default: self = .unknown
+      }
+    }
+
+    /// Default consent setting (except a regional setting).
+    public static let defaultSetting = Self(rawValue: 1)
+    /// Delegated ad_personalization setting.
+    public static let delegated = Self(rawValue: 2)
+    /// Regional consent applied by `APMShouldApplyRegionalConsent`.
+    public static let regional = Self(rawValue: 8)
+
     /// Initial value (`resetDiagnosticSources`)
     public static let unknown = Self(rawValue: 0)
     /// Consent type has no value

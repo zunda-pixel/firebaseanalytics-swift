@@ -86,7 +86,7 @@ struct KeyValue: ProtobufMessage {
       case 6:
         let arrayValue: Array6 = try decoder.messageField(field)
         values.append(arrayValue.value)
-      default: throw ProtobufDecodingError.unknownError
+      default: try decoder.skipField(field)
       }
     }
 
@@ -145,7 +145,7 @@ struct Array6: ProtobufDecodableMessage, ProtobufEncodableMessage {
         } else {
           throw ProtobufDecodingError.unknownError
         }
-      default: throw ProtobufDecodingError.unknownError
+      default: try decoder.skipField(field)
       }
     }
 

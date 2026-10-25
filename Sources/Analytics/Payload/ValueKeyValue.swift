@@ -42,7 +42,7 @@ public struct ValueKeyValue: ProtobufMessage, Equatable {
         } else {
           throw ProtobufDecodingError.unknownError
         }
-      default: throw ProtobufDecodingError.unknownError
+      default: try decoder.skipField(field)
       }
     }
 

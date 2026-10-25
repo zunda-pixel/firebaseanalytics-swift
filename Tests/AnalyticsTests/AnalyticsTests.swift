@@ -87,14 +87,47 @@ struct PayloadTests {
   @Test
   func unknownFieldsAreSkipped() throws {
     var data = try ProtobufEncoder.encoding(payload)
-    // 91: varint, 89: length-delimited
+    // 92: varint, 89: length-delimited
     data += try ProtobufEncoder.encoding { encoder in
-      encoder.uintField(91, 123, defaultValue: nil)
+      encoder.uintField(92, 123, defaultValue: nil)
       try encoder.stringField(89, "unknown", defaultValue: nil)
     }
     var decoder = ProtobufDecoder(data)
     #expect(try Payload(from: &decoder) == payload)
   }
+  @Test
+  func sdkMetadataWireFixture() throws {
+    // Independent protobuf fixture: field 87 = 0x10f (including an unknown bit),
+    // field 91 = -1 as a signed int64 varint, not zigzag.
+    let fixture: [UInt8] = [
+      0xb8, 0x05, 0x8f, 0x02,
+      0xd8, 0x05, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01,
+    ]
+    let original = try ProtobufEncoder.encoding(payload)
+    var decoder = ProtobufDecoder(original + Data(fixture))
+    var expected = payload
+    expected.sdkCapabilities = [
+      .appDataConsentStatus, .privateSetMembership,
+      .alphaAppAdsOnDeviceConversion, .googleAdsOnDeviceConversion,
+      SDKCapabilities(rawValue: 1 << 8),
+    ]
+    expected.sbtMicros = -1
+    #expect(try Payload(from: &decoder) == expected)
+    #expect(Array(try ProtobufEncoder.encoding(expected).suffix(fixture.count)) == fixture)
+  }
+
+  @Test
+  func sdkMetadataPresence() throws {
+    for value: SDKCapabilities? in [nil, []] {
+      var expected = payload
+      expected.sdkCapabilities = value
+      expected.sbtMicros = value == nil ? nil : 0
+      let data = try ProtobufEncoder.encoding(expected)
+      var decoder = ProtobufDecoder(data)
+      #expect(try Payload(from: &decoder) == expected)
+    }
+  }
+
 }
 
 struct ParameterTests {
@@ -146,5 +179,62 @@ struct ConsentSettingsTests {
         adPersonalizationSource: .init(rawValue: 1)
       ) == "19911"
     )
+  }
+  @Test
+  func diagnosticSourceConversion() {
+    let fixtures = [
+      (5, 7), (10, 5), (20, 3), (30, 5), (40, 4),
+      (0, 0), (-1, 0), (6, 0), (19, 0), (41, 0), (Int.min, 0), (Int.max, 0),
+    ]
+    for (source, digit) in fixtures {
+      #expect(ConsentSettings.DiagnosticSource(consentSource: source).rawValue == digit)
+    }
+    let settings = ConsentSettings(
+      adStorage: .denied, analyticsStorage: .granted,
+      adUserData: .denied, adPersonalization: .granted)
+    #expect(
+      settings.consentDiagnostics(
+        adStorageSource: .defaultSetting,
+        analyticsStorageSource: .init(consentSource: 20), adUserDataSource: .regional,
+        adPersonalizationSource: .delegated) == "11382")
+  }
+
+}
+
+struct ForwardCompatibilityTests {
+  @Test
+  func nestedUnknownFields() throws {
+    // Field 100 (varint) before and after known fields at each message level.
+    let unknown = Data([0xa0, 0x06, 0x01])
+    let valueData = unknown + Data([0x10, 0x01]) + unknown
+    var valueDecoder = ProtobufDecoder(valueData)
+    // 0x10 is field 2 with the wrong wire type; malformed known fields must fail.
+    #expect(throws: (any Error).self) { try Parameter.Value(from: &valueDecoder) }
+
+    var scalarDecoder = ProtobufDecoder(unknown + Data([0x18, 0x2a]) + unknown)
+    #expect(try Parameter.Value(from: &scalarDecoder) == .uint(42))
+
+    let keyValue = KeyValue(key: "quantity", value: .uint(42))
+    let paramData = unknown + (try ProtobufEncoder.encoding(keyValue)) + unknown
+    var paramDecoder = ProtobufDecoder(paramData)
+    let decoded = try KeyValue(from: &paramDecoder)
+    #expect(decoded.key == keyValue.key)
+    #expect(decoded.value == keyValue.value)
+
+    let attribute = ValueKeyValue(date: 0, key: "_sid", value: .uint(42))
+    var attributeDecoder = ProtobufDecoder(
+      unknown + (try ProtobufEncoder.encoding(attribute)) + unknown)
+    #expect(try ValueKeyValue(from: &attributeDecoder) == attribute)
+
+    let array = Array6(value: .dictionary(["quantity": .uint(42)]))
+    var arrayDecoder = ProtobufDecoder(unknown + (try ProtobufEncoder.encoding(array)) + unknown)
+    #expect(try Array6(from: &arrayDecoder).value == array.value)
+
+    let event = EventPayload(
+      eventName: "purchase", parameters: [:],
+      previousTimestampMillis: nil, timestampMillis: 0)
+    let batch = NestedValue(value: event)
+    var batchDecoder = ProtobufDecoder(unknown + (try ProtobufEncoder.encoding(batch)) + unknown)
+    #expect(try NestedValue<EventPayload>(from: &batchDecoder) == batch)
   }
 }

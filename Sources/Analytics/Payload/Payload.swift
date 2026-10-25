@@ -88,6 +88,10 @@ public struct Payload: ProtobufMessage, Equatable {
   public var corePlatformServices: String?
   /// 77: incremented for each delivery (`lastDeliveryIndex`)
   public var deliveryIndex: UInt?
+  /// 87: consent availability and linked conversion libraries.
+  public var sdkCapabilities: SDKCapabilities?
+  /// 91: SDK's `sbtMicros` value, in microseconds. Its clock origin is unconfirmed.
+  public var sbtMicros: Int64?
 
   public init(
     protocolVersion: UInt = 1,
@@ -130,7 +134,9 @@ public struct Payload: ProtobufMessage, Equatable {
     consentDiagnostics: String? = nil,
     isDMARegion: Bool? = nil,
     corePlatformServices: String? = nil,
-    deliveryIndex: UInt? = nil
+    deliveryIndex: UInt? = nil,
+    sdkCapabilities: SDKCapabilities? = nil,
+    sbtMicros: Int64? = nil
   ) {
     self.protocolVersion = protocolVersion
     self.events = events
@@ -173,6 +179,8 @@ public struct Payload: ProtobufMessage, Equatable {
     self.isDMARegion = isDMARegion
     self.corePlatformServices = corePlatformServices
     self.deliveryIndex = deliveryIndex
+    self.sdkCapabilities = sdkCapabilities
+    self.sbtMicros = sbtMicros
   }
 
   public init(from decoder: inout ProtobufDecoder) throws {
@@ -217,6 +225,8 @@ public struct Payload: ProtobufMessage, Equatable {
     var isDMARegion: Bool?
     var corePlatformServices: String?
     var deliveryIndex: UInt?
+    var sdkCapabilities: SDKCapabilities?
+    var sbtMicros: Int64?
 
     while let field = try decoder.nextField() {
       switch field.tag {
@@ -265,7 +275,11 @@ public struct Payload: ProtobufMessage, Equatable {
       case 72: isDMARegion = try decoder.boolField(field)
       case 73: corePlatformServices = try decoder.stringField(field)
       case 77: deliveryIndex = try decoder.uintField(field)
-      // 22, 15, 28, 29, 34, 41, 47, 50, 55, 59, 67, 75, 79, 84, 86, 87, 89, 91 are not modeled yet.
+      case 87:
+        sdkCapabilities = SDKCapabilities(
+          rawValue: UInt32(truncatingIfNeeded: try decoder.uintField(field)))
+      case 91: sbtMicros = Int64(bitPattern: UInt64(try decoder.uintField(field)))
+      // 22, 15, 28, 29, 34, 41, 47, 50, 55, 59, 67, 75, 79, 84, 86, 89 are not modeled yet.
       default: try decoder.skipField(field)
       }
     }
@@ -314,7 +328,9 @@ public struct Payload: ProtobufMessage, Equatable {
         consentDiagnostics: consentDiagnostics,
         isDMARegion: isDMARegion,
         corePlatformServices: corePlatformServices,
-        deliveryIndex: deliveryIndex
+        deliveryIndex: deliveryIndex,
+        sdkCapabilities: sdkCapabilities,
+        sbtMicros: sbtMicros
       )
     } else {
       throw ProtobufDecodingError.missingField
@@ -373,5 +389,7 @@ public struct Payload: ProtobufMessage, Equatable {
     isDMARegion.map { encoder.boolField(72, $0, defaultValue: nil) }
     try corePlatformServices.map { try encoder.stringField(73, $0, defaultValue: nil) }
     deliveryIndex.map { encoder.uintField(77, $0, defaultValue: nil) }
+    sdkCapabilities.map { encoder.uintField(87, UInt($0.rawValue), defaultValue: nil) }
+    sbtMicros.map { encoder.uintField(91, UInt(truncatingIfNeeded: $0), defaultValue: nil) }
   }
 }
