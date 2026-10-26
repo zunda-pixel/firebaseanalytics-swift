@@ -92,7 +92,3 @@ let analytics = Analytics(
 
 try await analytics.log(payload: payload)
 ```
-
-## Protocol
-
-Field numbers and meanings of the upload payload are documented in [docs/measurement-protocol.md](docs/measurement-protocol.md).
