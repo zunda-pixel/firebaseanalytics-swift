@@ -1,5 +1,6 @@
 import ProtobufKit
 
+/// `appmeasurement.Event`
 public struct EventPayload: ProtobufMessage, Equatable {
   public var eventName: Event.Name
   public var parameters: [Parameter.Key: Parameter.Value]
@@ -40,7 +41,8 @@ public struct EventPayload: ProtobufMessage, Equatable {
       case 2: eventName = .init(stringLiteral: try decoder.stringField(field))
       case 3: timestampMillis = try decoder.uintField(field)
       case 4: previousTimestampMillis = try decoder.uintField(field)
-      default: throw ProtobufDecodingError.unknownError
+      // 5, 6, 7 are not modeled yet.
+      default: try decoder.skipField(field)
       }
     }
 
@@ -57,6 +59,9 @@ public struct EventPayload: ProtobufMessage, Equatable {
   }
 }
 
+/// `appmeasurement.EventParam`
+///
+/// 1: name, 2: string, 3: int64, 4: float, 5: double, 6: repeated EventParam
 struct KeyValue: ProtobufMessage {
   var key: Parameter.Key
   var value: Parameter.Value
@@ -76,11 +81,12 @@ struct KeyValue: ProtobufMessage {
       case 1: key = .init(stringLiteral: try decoder.stringField(field))
       case 2: value = .string(try decoder.stringField(field))
       case 3: value = .uint(try decoder.uintField(field))
+      case 4: value = .float(Double(try decoder.floatField(field)))
       case 5: value = .float(try decoder.doubleField(field))
       case 6:
         let arrayValue: Array6 = try decoder.messageField(field)
         values.append(arrayValue.value)
-      default: throw ProtobufDecodingError.unknownError
+      default: try decoder.skipField(field)
       }
     }
 
@@ -117,6 +123,7 @@ struct KeyValue: ProtobufMessage {
   }
 }
 
+/// `appmeasurement.EventParam` without name. Its children (field 6) are `EventParam`.
 struct Array6: ProtobufDecodableMessage, ProtobufEncodableMessage {
   var value: Parameter.Value
 
@@ -138,7 +145,7 @@ struct Array6: ProtobufDecodableMessage, ProtobufEncodableMessage {
         } else {
           throw ProtobufDecodingError.unknownError
         }
-      default: throw ProtobufDecodingError.unknownError
+      default: try decoder.skipField(field)
       }
     }
 

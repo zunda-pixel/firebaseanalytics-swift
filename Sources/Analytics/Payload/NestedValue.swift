@@ -14,7 +14,7 @@ struct NestedValue<Value: ProtobufMessage & Equatable>: ProtobufMessage, Equatab
       switch field.tag {
       case 1:
         value = try decoder.messageField(field)
-      default: throw ProtobufDecodingError.unknownError
+      default: try decoder.skipField(field)
       }
     }
 
